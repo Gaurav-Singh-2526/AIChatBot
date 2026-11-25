@@ -6,7 +6,7 @@ const Message = require("../models/message");
 const {
     generateAIResponse
 } = require("../services/ollamaServices");
-const message = require("../models/message");
+// const message = require("../models/message");
 
 
 // 1. send msg and get response
@@ -85,13 +85,14 @@ exports.sendMessage = async (req, res) => {
 
         //Select model
 
-        const selectedModel =  process.env.OLLAMA_MODEL || "qwen2.5:3b";
+        const selectedModel = process.env.OLLAMA_MODEL || "qwen2.5:3b";
         let aiContent;
         try {
             aiContent = await generateAIResponse({
                 model: selectedModel,
                 messages
             });
+
         } catch (ollamaError) {
             console.error(
                 "ollama Error:",
@@ -109,7 +110,7 @@ exports.sendMessage = async (req, res) => {
             chatId: chat._id,
             userId: req.user._id,
             role: "assistant",
-            constent: aiContent,
+            content: aiContent,
             model: selectedModel
         });
 
@@ -154,7 +155,7 @@ exports.getMessages = async (req, res) => {
 
         // check ownership
         const chat = await Chat.findOne({
-            _id: chat._id,
+            _id: chatId,
             userId: req.user._id
         });
         if (!chat) {
@@ -193,7 +194,7 @@ exports.getMessages = async (req, res) => {
             page,
             limit,
             totalPages: Math.ceil(total / limit),
-            message
+            messages
         });
     } catch (error) {
         console.error("Get message Error:", error);
@@ -202,4 +203,4 @@ exports.getMessages = async (req, res) => {
             message: "Failed to fetch messages"
         });
     }
-};
+};  
