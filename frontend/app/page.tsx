@@ -5,6 +5,7 @@ import AuthScreen from "@/components/AuthScreen";
 import ChatWorkspace from "@/components/ChatWorkspace";
 import LandingPage from "@/components/LandingPage";
 import { fetchMe, getStoredToken, setStoredToken } from "@/lib/api";
+import { disconnectSocket } from "@/lib/socket";
 import type { User } from "@/lib/types";
 
 export default function HomePage() {
@@ -36,6 +37,7 @@ export default function HomePage() {
   }, []);
 
   const handleLogout = () => {
+    disconnectSocket();
     setStoredToken(null);
     setUser(null);
     setAuthMode(null);

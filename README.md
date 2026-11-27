@@ -12,7 +12,7 @@ A full-stack Multi-Domain AI Chatbot Web Application with switchable domain-spec
   * `OUT_OF_DOMAIN` — Returns a polite domain-specific refusal without calling the answer-generation model.
   * `AMBIGUOUS` — Prompts the user for clarification without calling the answer-generation model.
 * **Prompt-Injection & Fail-Closed Protection**: Classifier outputs are strictly validated as JSON on the backend; invalid or unconfirmed outputs never fall back to unrestricted generation.
-* **Real-Time NDJSON Streaming**: Streams `start`, `chunk`, `done`, and `error` events with `AbortController` cancellation so aborted partial responses are never saved as completed messages.
+* **Real-Time Streaming (Socket.IO + NDJSON)**: Primary real-time streaming over **Socket.IO** (`chat:send`, `chat:start`, `chat:chunk`, `chat:done`, `chat:error`, `chat:stop`) with JWT handshake authentication, plus automatic HTTP **NDJSON** streaming (`POST /api/messages/stream`) fallback and `AbortController` cancellation so aborted partial responses are never saved as completed messages.
 * **Admin Control Center (`/admin`)**:
   * Create, update, activate/deactivate, and soft-delete chatbots (preserving historical conversations).
   * Configure `name`, `slug`, `description`, `systemPrompt`, `allowedTopics`, `restrictedTopics`, and local Ollama model.
@@ -24,8 +24,8 @@ A full-stack Multi-Domain AI Chatbot Web Application with switchable domain-spec
 
 ## Tech Stack
 
-* **Frontend (`frontend/`)**: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4
-* **Backend (`backend/`)**: Node.js, Express 5 (CommonJS), Mongoose 9, JWT (`jsonwebtoken`), `bcryptjs`, Axios, Swagger UI
+* **Frontend (`frontend/`)**: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4, `socket.io-client`
+* **Backend (`backend/`)**: Node.js, Express 5 (CommonJS), Mongoose 9, Socket.IO, JWT (`jsonwebtoken`), `bcryptjs`, Axios, Swagger UI
 * **Database**: MongoDB
 * **AI Runtime**: Local Ollama (`/api/chat`, `/api/tags`, default model `qwen2.5:3b`)
 
@@ -225,6 +225,9 @@ cd backend
 
 # HTTP controller, RBAC, classification gating, and NDJSON route tests (mocked Mongoose)
 node tests/controllerTests.js
+
+# Socket.IO JWT auth, classification gating, and streaming tests (mocked Mongoose)
+node tests/socketTests.js
 
 # Live Ollama (qwen2.5:3b) classification & stream cancellation tests
 node tests/runVerification.js
