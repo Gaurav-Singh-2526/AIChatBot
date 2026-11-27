@@ -12,9 +12,9 @@ import {
   regenerateMessage,
   renameChat,
   selectChatbot,
-  streamMessage,
   submitFeedback
 } from "@/lib/api";
+import { getSocket, streamMessageWithSocket } from "@/lib/socket";
 import type { Chat, Chatbot, Message, User } from "@/lib/types";
 import ChatbotSelector from "./ChatbotSelector";
 import ChatSidebar from "./ChatSidebar";
@@ -106,6 +106,11 @@ export default function ChatWorkspace({
       mounted = false;
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Initialize authenticated Socket.IO connection
+  useEffect(() => {
+    getSocket();
+  }, [user.id]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -280,7 +285,7 @@ export default function ChatWorkspace({
     setStreaming(true);
 
     try {
-      await streamMessage({
+      await streamMessageWithSocket({
         chatId: targetChatId,
         content: trimmed,
         signal: controller.signal,

@@ -1,3 +1,4 @@
+const http = require("http");
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
@@ -6,6 +7,7 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./config/swagger");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 const { ensureDefaultChatbots } = require("./utils/seedChatbots");
+const { initSocketServer } = require("./services/socketService");
 
 dotenv.config();
 
@@ -45,6 +47,9 @@ const PORT = process.env.PORT || 5000;
 const API_URL = process.env.API_URL || `http://localhost:${PORT}`;
 
 if (require.main === module) {
+  const httpServer = http.createServer(app);
+  initSocketServer(httpServer);
+
   connectDB().then(async () => {
     try {
       const seedResult = await ensureDefaultChatbots();
@@ -55,9 +60,10 @@ if (require.main === module) {
       console.error("Chatbot seeding skipped:", err.message);
     }
 
-    app.listen(PORT, () => {
+    httpServer.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
       console.log(`Swagger Docs: ${API_URL}/api-docs`);
+      console.log("Socket.IO enabled with JWT authentication");
     });
   });
 }
