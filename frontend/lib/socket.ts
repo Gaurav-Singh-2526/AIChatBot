@@ -1,9 +1,6 @@
 import { io, type Socket } from "socket.io-client";
-import { getStoredToken, streamMessage } from "./api";
+import { API_BASE, getStoredToken, streamMessage } from "./api";
 import type { StreamEvent } from "./types";
-
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 let socketInstance: Socket | null = null;
 let socketToken: string | null = null;
