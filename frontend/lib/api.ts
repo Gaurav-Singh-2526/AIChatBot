@@ -9,8 +9,9 @@ import type {
   User
 } from "./types";
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL || " https://aichatbot-2-31nv.onrender.com";
+export const API_BASE = (
+  process.env.NEXT_PUBLIC_API_URL || "https://aichatbot-2-31nv.onrender.com"
+).trim();
 
 const TOKEN_STORAGE_KEY = "aichatbot_token";
 
