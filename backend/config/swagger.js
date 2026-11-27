@@ -11,10 +11,10 @@ const options = {
             description: "Complete API documentation for AI Chatbot Backend"
         },
 
-        servers: [
+        servers: [ 
             {
-                url: "http://localhost:5000",
-                description: "Local Development Server"
+                url: process.env.API_URL || "http://localhost:5000",
+                description: "API Server"
             }
         ],
 

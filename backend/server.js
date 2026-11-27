@@ -42,6 +42,7 @@ app.use(notFound);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
+const API_URL = process.env.API_URL || `http://localhost:${PORT}`;
 
 if (require.main === module) {
   connectDB().then(async () => {
@@ -56,7 +57,7 @@ if (require.main === module) {
 
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
-      console.log(`Swagger Docs: http://localhost:${PORT}/api-docs`);
+      console.log(`Swagger Docs: ${API_URL}/api-docs`);
     });
   });
 }
