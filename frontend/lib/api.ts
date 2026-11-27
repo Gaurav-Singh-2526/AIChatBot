@@ -10,7 +10,7 @@ import type {
 } from "./types";
 
 const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+  process.env.NEXT_PUBLIC_API_URL || " https://aichatbot-2-31nv.onrender.com";
 
 const TOKEN_STORAGE_KEY = "aichatbot_token";
 
