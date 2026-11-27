@@ -128,6 +128,7 @@ ollama serve
 ```env
 DATABASR_URL=mongodb+srv://<username>:<password>@<cluster-url>/
 PORT=5000
+API_URL=http://localhost:5000
 JWT_SECRET=<your-strong-jwt-secret>
 JWT_EXPIRES_IN=7d
 NODE_ENV=development
