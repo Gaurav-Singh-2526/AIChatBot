@@ -10,7 +10,7 @@ const {
     clearChatMessages
 
 } = require("../controllers/chatController");
-const { protect } = require("../midddleware/authMiddleWare");
+const { protect } = require("../middleware/authMiddleware");
 
 router.use(protect);
 //create new chat

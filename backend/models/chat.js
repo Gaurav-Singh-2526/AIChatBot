@@ -1,33 +1,50 @@
+
 const mongoose = require("mongoose");
 
 const chatSchema = new mongoose.Schema(
     {
-        userId:{
-            type:mongoose.Schema.Types.ObjectId,
-            ref:"User",
-            require:true,
-            index:true
+        userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+            index: true
         },
-        title:{
-            type:String,
-            trim:true,
-            default:"New Chat",
-            maxlength:100
+
+        chatbotId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Chatbot",
+            default: null,
+            index: true
         },
-        model:{
-            type:String,
-            default:"ollama3"
+
+        title: {
+            type: String,
+            trim: true,
+            default: "New Chat",
+            maxlength: 100
         },
-        isArchived:{
-            type:Boolean,
-            default:false
+
+        model: {
+            type: String,
+            default: "qwen2.5:3b"
+        },
+
+        isArchived: {
+            type: Boolean,
+            default: false
         }
     },
     {
-        timestamps:true
+        timestamps: true
     }
 );
 
-chatSchema.index({ userId:1,updatedAt:-1});
+chatSchema.index({ userId: 1, updatedAt: -1 });
 
-module.exports = mongoose.model("Chat",chatSchema);
+chatSchema.index({
+    userId: 1,
+    chatbotId: 1,
+    updatedAt: -1
+});
+
+module.exports = mongoose.model("Chat", chatSchema);
