@@ -24,8 +24,13 @@ export function getSocket(): Socket | null {
   socketToken = token;
   socketInstance = io(API_BASE, {
     auth: { token },
-    transports: ["websocket", "polling"],
+    transports: ["polling", "websocket"],
+    reconnectionAttempts: 3,
     autoConnect: true
+  });
+
+  socketInstance.on("connect_error", () => {
+    // Falls back gracefully to HTTP NDJSON streaming when socket is unavailable
   });
 
   return socketInstance;
