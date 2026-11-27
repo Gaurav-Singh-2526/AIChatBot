@@ -3,37 +3,52 @@ const mongoose = require("mongoose");
 const messageSchema = new mongoose.Schema(
     {
         chatId: {
-            type:mongoose.Schema.Types.ObjectId,
-            ref:"Chat",
-            required:true,
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Chat",
+            required: true,
             index: true
         },
-        userId:{
+        userId: {
             type: mongoose.Schema.Types.ObjectId,
-            ref:"User",
-            required:true,
-            index:true
+            ref: "User",
+            required: true,
+            index: true
         },
-        role:{
-            type:String,
-            enum:["user","assistant","system"],
-            required:true           
+        role: {
+            type: String,
+            enum: ["user", "assistant", "system"],
+            required: true
         },
-        content:{
-            type:String,
-            required:true
+        content: {
+            type: String,
+            required: true
         },
-        model:{
-            type:String,
-            default:null
+        classification: {
+            status: {
+                type: String,
+                enum: [
+                    "IN_DOMAIN",
+                    "OUT_OF_DOMAIN",
+                    "AMBIGUOUS"
+                ],
+                default: null
+            },
+            reason: {
+                type: String,
+                default: null
+            }
+        },
+        model: {
+            type: String,
+            default: null
         }
     },
     {
-        timestamps:true
+        timestamps: true
     }
 
 );
 
-messageSchema.index({chatId:1,createdAt:-1});
+messageSchema.index({ chatId: 1, createdAt: -1 });
 
-module.exports = mongoose.model("message",messageSchema);
+module.exports = mongoose.model("message", messageSchema);

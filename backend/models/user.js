@@ -30,6 +30,11 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin"],
       default: "user"
     },
+    selectedChatbotId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Chatbot",
+      default: null
+    },
 
     isActive: {
       type: Boolean,

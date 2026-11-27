@@ -1,29 +1,22 @@
-
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const connectDB = require("./config/db");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./config/swagger");
+const { notFound, errorHandler } = require("./middleware/errorMiddleware");
+const { ensureDefaultChatbots } = require("./utils/seedChatbots");
+
 dotenv.config();
 
 const app = express();
 
 // Middleware
 app.use(cors());
-app.use(express.json());  
-
-// Database connection
-connectDB();
+app.use(express.json({ limit: "1mb" }));
 
 // Swagger API Documentation
-app.use(
-    "/api-docs",
-    swaggerUi.serve,
-    swaggerUi.setup(swaggerSpec)
-);
-// Authentication routes
-app.use("/api/auth",require("./routes/authRoutes"));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Test route
 app.get("/", (req, res) => {
@@ -32,13 +25,40 @@ app.get("/", (req, res) => {
     message: "AI Chatbot API is running!"
   });
 });
-//chats and messages 
-app.use("/api/chats",require("./routes/chatRoutes"))
-app.use("/api/messages",require("./routes/messageRoutes"));
-// Server
+
+// Routes
+app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/chatbots", require("./routes/chatbotRoutes"));
+app.use("/api/admin", require("./routes/adminRoutes"));
+app.use("/api/chats", require("./routes/chatRoutes"));
+app.use("/api/messages", require("./routes/messageRoutes"));
+app.use("/api/messages/stream", require("./routes/streamRoutes"));
+app.use("/api/models", require("./routes/modelRoutes"));
+app.use("/api/feedback", require("./routes/feedbackRoutes"));
+app.use("/api/users", require("./routes/userRoutes"));
+
+// Error handling
+app.use(notFound);
+app.use(errorHandler);
+
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`Swagger Docs: http://localhost:${PORT}/api-docs`);
-});
+if (require.main === module) {
+  connectDB().then(async () => {
+    try {
+      const seedResult = await ensureDefaultChatbots();
+      if (seedResult.seeded > 0) {
+        console.log(`Seeded ${seedResult.seeded} default domain chatbots.`);
+      }
+    } catch (err) {
+      console.error("Chatbot seeding skipped:", err.message);
+    }
+
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+      console.log(`Swagger Docs: http://localhost:${PORT}/api-docs`);
+    });
+  });
+}
+
+module.exports = app;

@@ -1,8 +1,8 @@
 const User = require("../models/user");
+const Chatbot = require("../models/chatbot");
 const bcrypt = require("bcryptjs");
 const generateToken = require("../utils/generateToken");
-// const user = require("../models/user");
-// const User = require("../models/user");
+const { ensureDefaultChatbots } = require("../utils/seedChatbots");
 
 //Register user
 
@@ -12,14 +12,14 @@ exports.registerUser = async (req, res) => {
         if (!name || !email || !password) {
             return res.status(400).json({
                 success: false,
-                message: "All field are require"
+                message: "All fields are required"
             });
         }
-        if (password.length < 6) {
+        if (typeof password !== "string" || password.length < 8) {
             return res.status(400).json({
-                sucess: false,
-                message: "Password must contain at least 6 characters"
-            })
+                success: false,
+                message: "Password must contain at least 8 characters"
+            });
         }
         const existingUser = await User.findOne({
             email: email.toLowerCase().trim()
@@ -37,6 +37,11 @@ exports.registerUser = async (req, res) => {
             password
         });
 
+        const chatbotCount = await Chatbot.countDocuments({ isDeleted: false });
+        if (chatbotCount === 0) {
+            await ensureDefaultChatbots(user._id).catch(() => {});
+        }
+
         const token = await generateToken(user._id);
         return res.status(201).json({
             success: true,
@@ -46,8 +51,8 @@ exports.registerUser = async (req, res) => {
                 id: user._id,
                 name: user.name,
                 email: user.email,
-                role: user.role
-
+                role: user.role,
+                selectedChatbotId: user.selectedChatbotId || null
             }
         });
     } catch (error) {
@@ -69,8 +74,8 @@ exports.loginUser = async (req, res) => {
         const { email, password } = req.body;
         if (!email || !password) {
             return res.status(400).json({
-                sucess: false,
-                message: "email and password are require"
+                success: false,
+                message: "Email and password are required"
             });
         }
         const user = await User.findOne({
@@ -109,7 +114,8 @@ exports.loginUser = async (req, res) => {
                 id:user._id,
                 name:user.name,
                 email:user.email,
-                role:user.role
+                role:user.role,
+                selectedChatbotId: user.selectedChatbotId || null
             }
         });
     }catch(error){
